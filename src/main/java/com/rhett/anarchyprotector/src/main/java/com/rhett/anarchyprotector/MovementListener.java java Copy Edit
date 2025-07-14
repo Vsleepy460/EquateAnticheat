@@ -1,0 +1,35 @@
+package com.rhett.anarchyprotector;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.ChatColor;
+
+public class MovementListener implements Listener {
+
+    private final AnarchyProtector plugin;
+    private final double SPEED_THRESHOLD = 1.8;
+
+    public MovementListener(AnarchyProtector plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        Location from = event.getFrom();
+        Location to = event.getTo();
+
+        if (to == null || (from.getX() == to.getX() && from.getZ() == to.getZ())) return;
+
+        double distance = from.distance(to);
+        if (distance > SPEED_THRESHOLD) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "[AnarchyProtector] You're moving too fast.");
+            plugin.getLogger().warning(player.getName() + " tried to move too fast: " + distance);
+        }
+    }
+}
